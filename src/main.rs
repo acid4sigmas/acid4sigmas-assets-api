@@ -4,7 +4,12 @@ use serde::Serialize;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-const TARGET_FOLDER: &str = "assets";
+mod fs_helper;
+mod upload;
+
+use crate::upload::upload_file;
+
+const TARGET_FOLDER: &str = "/";
 
 #[derive(Serialize)]
 struct FolderContent {
@@ -132,7 +137,11 @@ async fn main() -> std::io::Result<()> {
             .allow_any_header()
             .max_age(3600);
 
-        App::new().wrap(cors).service(get_file).service(get_folder)
+        App::new()
+            .wrap(cors)
+            .service(get_file)
+            .service(get_folder)
+            .service(upload_file)
     })
     .bind("127.0.0.1:8087")?
     .run()
